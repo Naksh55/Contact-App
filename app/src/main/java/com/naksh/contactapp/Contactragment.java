@@ -55,6 +55,7 @@ public class Contactragment extends Fragment {
                     contactList.add(contact);
                 }
                 contactsAdapter.notifyDataSetChanged();
+
             }
 
             @Override
