@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference databaseContacts;
     private SearchView searchView;
 
-
+String name="naksh";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
