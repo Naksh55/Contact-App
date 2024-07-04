@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "462865236018",
+    "firebase_url": "https://contact-app-6e1d0-default-rtdb.firebaseio.com",
+    "project_id": "contact-app-6e1d0",
+    "storage_bucket": "contact-app-6e1d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462865236018:android:387dd7e613c65b6404fc2b",
+        "android_client_info": {
+          "package_name": "com.naksh.contactapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1aNj5f7hA_qF23q4ooG4j2wEc6pf-gvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
