@@ -28,7 +28,6 @@ public class Contactragment extends Fragment {
     private List<Contact> contactList;
     private DatabaseReference databaseContacts;
     private SearchView searchView;
-    int num=1;
     public Contactragment() {
         // Required empty public constructor
     }
