@@ -293,6 +293,7 @@ import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -308,6 +309,8 @@ import java.util.List;
 public class Contactragment extends Fragment {
 
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private static final int PERMISSIONS_REQUEST_SEND_SMS = 101;
+
 
     private RecyclerView recyclerView;
     private ContactsAdapter contactsAdapter;
@@ -379,6 +382,12 @@ public class Contactragment extends Fragment {
             readContacts();
         }
 
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.SEND_SMS}, PERMISSIONS_REQUEST_SEND_SMS);
+        }
+
         return view;
     }
 
@@ -440,16 +449,25 @@ public class Contactragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, read contacts
                 readContacts();
+            }
+        } else if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Permission granted to make calls", Toast.LENGTH_SHORT).show();
             } else {
-                // Permission denied, handle accordingly
+                Toast.makeText(getContext(), "Permission denied to make calls", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == PERMISSIONS_REQUEST_SEND_SMS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "Permission granted to send SMS", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Permission denied to send SMS", Toast.LENGTH_SHORT).show();
             }
         }
     }
 }
-
 
 
