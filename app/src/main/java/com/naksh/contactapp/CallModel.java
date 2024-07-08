@@ -1,7 +1,7 @@
 package com.naksh.contactapp;
 
 public class CallModel {
-    String calltype,name,callduration,time;
+    String calltype,name,callduration,time,callername;
 
     public CallModel() {
     }
@@ -11,6 +11,14 @@ public class CallModel {
         this.name = name;
         this.callduration = callduration;
         this.time = time;
+    }
+
+    public CallModel(String calltype, String name, String callduration, String time, String callername) {
+        this.calltype = calltype;
+        this.name = name;
+        this.callduration = callduration;
+        this.time = time;
+        this.callername = callername;
     }
 
     public String getCalltype() {
@@ -39,6 +47,14 @@ public class CallModel {
 
     public String getTime() {
         return time;
+    }
+
+    public String getCallername() {
+        return callername;
+    }
+
+    public void setCallername(String callername) {
+        this.callername = callername;
     }
 
     public void setTime(String time) {

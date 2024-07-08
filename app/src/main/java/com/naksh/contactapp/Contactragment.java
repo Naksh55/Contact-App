@@ -274,9 +274,13 @@
 //    }
 //}
 //
+
+
+
 package com.naksh.contactapp;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -295,6 +299,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -319,6 +324,7 @@ public class Contactragment extends Fragment {
     private List<Contact> firebaseContactList;
     private DatabaseReference databaseContacts;
     private SearchView searchView;
+    private FloatingActionButton fab;
 
     public Contactragment() {
         // Required empty public constructor
@@ -337,6 +343,16 @@ public class Contactragment extends Fragment {
         firebaseContactList = new ArrayList<>();
         contactsAdapter = new ContactsAdapter(contactList);
         recyclerView.setAdapter(contactsAdapter);
+        fab = view.findViewById(R.id.f);
+        // Set a click listener for the FAB
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialPadBottomSheetFragment dialPadFragment = new DialPadBottomSheetFragment();
+                assert getFragmentManager() != null;
+                dialPadFragment.show(getFragmentManager(), "dialPadFragment");
+            }
+        });
 
         searchView = view.findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
