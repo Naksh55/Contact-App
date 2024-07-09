@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private SearchView searchView;
 
 
-String name="naksh";
+
+    String name="naksh";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

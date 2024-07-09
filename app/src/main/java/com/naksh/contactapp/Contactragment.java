@@ -460,6 +460,9 @@ public class Contactragment extends Fragment {
         });
 
         contactsAdapter.notifyDataSetChanged();
+
+        // Save merged contactList to Firebase
+//        databaseContacts.setValue(contactList);  // Assuming your databaseContacts reference points to the correct location
     }
 
     @Override

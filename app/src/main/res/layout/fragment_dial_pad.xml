@@ -6,6 +6,15 @@
     android:padding="16dp">
 
     <EditText
+        android:id="@+id/numberName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter name"
+        android:inputType="phone"
+        android:textSize="18sp"
+        android:focusable="false"
+        android:clickable="false" />
+    <EditText
         android:id="@+id/numberInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,6 +23,7 @@
         android:textSize="18sp"
         android:focusable="false"
         android:clickable="false" />
+
 
     <GridLayout
         android:layout_width="match_parent"
@@ -125,7 +135,7 @@
         android:id="@+id/btnDial"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Call"
+        android:text="Save"
         android:layout_marginTop="16dp"/>
 
 </LinearLayout>
