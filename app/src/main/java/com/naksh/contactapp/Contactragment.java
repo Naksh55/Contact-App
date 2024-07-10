@@ -355,6 +355,14 @@ public class Contactragment extends Fragment {
         });
 
         searchView = view.findViewById(R.id.searchView);
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setIconified(false);
+                searchView.requestFocusFromTouch();
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
