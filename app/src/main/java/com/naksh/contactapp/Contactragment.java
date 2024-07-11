@@ -1,4 +1,4 @@
-////package com.naksh.contactapp;
+package com.naksh.contactapp;////package com.naksh.contactapp;
 ////
 ////import android.Manifest;
 ////import android.content.pm.PackageManager;
@@ -274,12 +274,9 @@
 //    }
 //}
 //
-
-
-
-package com.naksh.contactapp;
-
 import android.Manifest;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -294,9 +291,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.ContactsContract;
+import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -310,13 +309,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class Contactragment extends Fragment {
-
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
-    private static final int PERMISSIONS_REQUEST_SEND_SMS = 101;
-
-
     private RecyclerView recyclerView;
     private ContactsAdapter contactsAdapter;
     private List<Contact> contactList;
@@ -325,7 +320,12 @@ public class Contactragment extends Fragment {
     private DatabaseReference databaseContacts;
     private SearchView searchView;
     private FloatingActionButton fab;
+    private ImageView voiceSearchButton;
 
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 0;
+    private static final int PERMISSIONS_REQUEST_SEND_SMS = 1;
+    private static final int PERMISSIONS_REQUEST_VOICE_SEARCH = 2;
+    private static final int VOICE_SEARCH_REQUEST_CODE = 3;
     public Contactragment() {
         // Required empty public constructor
     }
@@ -336,6 +336,7 @@ public class Contactragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contactragment, container, false);
 
+        voiceSearchButton = view.findViewById(R.id.voiceSearchButton);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         contactList = new ArrayList<>();
@@ -378,6 +379,13 @@ public class Contactragment extends Fragment {
             }
         });
 
+        voiceSearchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startVoiceSearch();
+            }
+        });
+
         databaseContacts = FirebaseDatabase.getInstance().getReference("contacts");
         databaseContacts.addValueEventListener(new ValueEventListener() {
             @Override
@@ -414,7 +422,40 @@ public class Contactragment extends Fragment {
 
         return view;
     }
+    private void startVoiceSearch() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_VOICE_SEARCH);
+        } else {
+            launchVoiceSearch();
+        }
+    }
 
+    private void launchVoiceSearch() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now");
+
+        try {
+            startActivityForResult(intent, VOICE_SEARCH_REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(getContext(), "Your device doesn't support speech input", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == VOICE_SEARCH_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (result != null && !result.isEmpty()) {
+                String voiceQuery = result.get(0);
+                searchView.setQuery(voiceQuery, true);
+            }
+        }
+    }
     private void filterContacts(String query) {
         ArrayList<Contact> filteredList = new ArrayList<>();
         for (Contact contact : contactList) {
@@ -493,8 +534,18 @@ public class Contactragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "Permission denied to send SMS", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == PERMISSIONS_REQUEST_VOICE_SEARCH) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchVoiceSearch();
+            } else {
+                Toast.makeText(getContext(), "Permission denied to use voice search", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
 }
+
+
+
 
 
