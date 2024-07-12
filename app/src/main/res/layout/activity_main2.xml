@@ -64,6 +64,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity2">
 
 <!--    <androidx.appcompat.widget.SearchView-->
@@ -76,15 +77,19 @@
 <!--            android:layout_alignParentStart="true"-->
 <!--            android:layout_alignParentEnd="true" />-->
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicatorColor="@color/tab_selected_text_color"
+        app:tabSelectedTextColor="@color/tab_selected_text_color"
+        app:tabTextColor="@color/tab_unselected_text_color">
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/mContacts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Contacts" />
+                android:text="Contacts"
+                />
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/mRecents"
                 android:layout_width="wrap_content"

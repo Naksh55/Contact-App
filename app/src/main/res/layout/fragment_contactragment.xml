@@ -3,18 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Contactragment">
 
     <androidx.appcompat.widget.SearchView
+        android:backgroundTint="@color/grey"
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/search_view_bg"
-
         android:iconifiedByDefault="false"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        app:searchIcon="@drawable/search_icon" />
 
     <ImageView
         android:id="@+id/voiceSearchButton"
@@ -41,7 +43,7 @@
         android:id="@+id/f"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/baseline_dialpad_24"
+        android:src="@drawable/baseline_add_box_24"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp" />

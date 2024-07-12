@@ -3,13 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".RecentCallFragment">
 
     <androidx.appcompat.widget.SearchView
+        android:backgroundTint="@color/grey"
         android:id="@+id/searchView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/search_view_bg"
+        app:searchIcon="@drawable/search_icon"
         android:iconifiedByDefault="false"
         android:layout_gravity="top" />
 
