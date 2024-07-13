@@ -257,6 +257,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         return contactList.size();
     }
 
+    public Contact getContactAtPosition(int position) {
+        return contactList.get(position);
+    }
+
     static class ContactViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPhoneNumber;
         ImageView call, sms;
