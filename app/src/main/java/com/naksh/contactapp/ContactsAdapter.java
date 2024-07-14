@@ -167,9 +167,29 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     private List<Contact> contactList;
     private static final int REQUEST_CODE_CALL_PHONE = 1;
     private static final int REQUEST_CODE_SEND_SMS = 2;
+    private OnDeleteClickListener onDeleteClickListener;
+    private OnUpdateClickListener onUpdateClickListener;
+    private List<Contact> filteredContactList;
 
+    public interface OnContactClickListener {
+        void onUpdateClick(int position);
+        void onDeleteClick(int position);
+    }
+    public interface OnDeleteClickListener {
+        void onDeleteClick(Contact contact);
+    }
+
+    public interface OnUpdateClickListener {
+        void onUpdateClick(Contact contact);
+    }
     public ContactsAdapter(List<Contact> contactList) {
         this.contactList = contactList;
+    }
+    public ContactsAdapter(List<Contact> contactList, OnUpdateClickListener onUpdateClickListener, OnDeleteClickListener onDeleteClickListener) {
+        this.contactList = contactList;
+        this.filteredContactList = new ArrayList<>(contactList);
+        this.onDeleteClickListener = onDeleteClickListener;
+        this.onUpdateClickListener = onUpdateClickListener;
     }
 
     public void updateList(ArrayList<Contact> newList) {
@@ -190,7 +210,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         Contact contact = contactList.get(position);
         holder.tvName.setText(contact.getName());
         holder.tvPhoneNumber.setText(contact.getPhoneNumber());
+        holder.ivUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onUpdateClickListener.onUpdateClick(contact);
+            }
+        });
 
+        holder.ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDeleteClickListener.onDeleteClick(contact);
+            }
+        });
         holder.call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -256,6 +288,11 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     public int getItemCount() {
         return contactList.size();
     }
+    public void removeContact(Contact contact) {
+        this.contactList.remove(contact);
+        this.filteredContactList.remove(contact);
+        notifyDataSetChanged();
+    }
 
     public Contact getContactAtPosition(int position) {
         return contactList.get(position);
@@ -263,7 +300,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
 
     static class ContactViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPhoneNumber;
-        ImageView call, sms;
+        ImageView call, sms, ivUpdate, ivDelete;
+
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -271,6 +309,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
             tvPhoneNumber = itemView.findViewById(R.id.tvPhoneNumber);
             call = itemView.findViewById(R.id.ivCall);
             sms = itemView.findViewById(R.id.ivSms);
+            ivUpdate = itemView.findViewById(R.id.ivUpdate);
+            ivDelete = itemView.findViewById(R.id.ivDelete);
         }
     }
 }

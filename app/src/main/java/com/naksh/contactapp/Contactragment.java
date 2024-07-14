@@ -276,6 +276,7 @@ package com.naksh.contactapp;////package com.naksh.contactapp;
 //
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -299,6 +300,8 @@ import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -316,6 +319,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class Contactragment extends Fragment {
     private RecyclerView recyclerView;
@@ -328,6 +332,7 @@ public class Contactragment extends Fragment {
     private FloatingActionButton fab;
     private ImageView voiceSearchButton;
 
+    String name;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 0;
     private static final int PERMISSIONS_REQUEST_SEND_SMS = 1;
     private static final int PERMISSIONS_REQUEST_VOICE_SEARCH = 2;
@@ -409,6 +414,8 @@ public class Contactragment extends Fragment {
                 firebaseContactList.clear();
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Contact contact = postSnapshot.getValue(Contact.class);
+                    assert contact != null;
+                    contact.setId(postSnapshot.getKey());  // Set the ID from the database key
                     firebaseContactList.add(contact);
                 }
                 mergeAndSetContacts();
@@ -451,8 +458,80 @@ public class Contactragment extends Fragment {
             readContacts();
         }
 
+        contactsAdapter = new ContactsAdapter(contactList, new ContactsAdapter.OnUpdateClickListener() {
+            @Override
+            public void onUpdateClick(Contact contact) {
+                showUpdateDialog(contact);
+            }
+        }, new ContactsAdapter.OnDeleteClickListener() {
+            @Override
+            public void onDeleteClick(Contact contact) {
+                deleteContact(contact);
+            }
+        });
+
+        recyclerView.setAdapter(contactsAdapter);
+
+
+
+        recyclerView.setAdapter(contactsAdapter);
+
         return view;
     }
+    private void showUpdateDialog(final Contact contact) {
+        if (contact.getId() == null) {
+            Toast.makeText(getContext(), "Contact ID is missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        final Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.fragment_update_delete); // Create a layout resource file for this dialog
+        EditText etName = dialog.findViewById(R.id.etName);
+        EditText etPhoneNumber = dialog.findViewById(R.id.etPhoneNumber);
+        Button btnUpdate = dialog.findViewById(R.id.btnUpdate);
+
+        etName.setText(contact.getName());
+        etPhoneNumber.setText(contact.getPhoneNumber());
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newName = etName.getText().toString();
+                String newPhoneNumber = etPhoneNumber.getText().toString();
+
+                contact.setName(newName);
+                contact.setPhoneNumber(newPhoneNumber);
+
+                // Update the contact in Firebase
+                DatabaseReference contactRef = databaseContacts.child(contact.getId());
+                contactRef.setValue(contact);
+
+                // Update the contact in the local list and notify the adapter
+                int index = contactList.indexOf(contact);
+                contactList.set(index, contact);
+                contactsAdapter.notifyItemChanged(index);
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void deleteContact(final Contact contact) {
+        if (contact.getId() == null) {
+            Toast.makeText(getContext(), "Contact ID is missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Delete the contact from Firebase
+        DatabaseReference contactRef = databaseContacts.child(contact.getId());
+        contactRef.removeValue();
+
+        // Remove the contact from the adapter
+        contactsAdapter.removeContact(contact);
+    }
+
 
     private boolean hasPermissions(Context context, String... permissions) {
         for (String permission : permissions) {
@@ -538,9 +617,11 @@ public class Contactragment extends Fragment {
             while (phones.moveToNext()) {
                 String name = phones.getString(nameIndex);
                 String phoneNumber = phones.getString(numberIndex);
-
+                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
                 // Add the contact to the list
-                mobileContactList.add(new Contact(name, phoneNumber));
+                String id = UUID.randomUUID().toString();
+
+                mobileContactList.add(new Contact(id,name, phoneNumber));
             }
             phones.close();
             mergeAndSetContacts();
