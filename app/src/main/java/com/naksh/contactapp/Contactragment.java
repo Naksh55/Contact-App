@@ -617,7 +617,7 @@ public class Contactragment extends Fragment {
             while (phones.moveToNext()) {
                 String name = phones.getString(nameIndex);
                 String phoneNumber = phones.getString(numberIndex);
-                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
                 // Add the contact to the list
                 String id = UUID.randomUUID().toString();
 

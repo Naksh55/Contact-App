@@ -148,6 +148,8 @@ public class CallAdapter extends RecyclerView.Adapter<CallAdapter.ViewHolder> {
         holder.callduration.setText(callModels.get(position).getCallduration());
         holder.date.setText(callModels.get(position).getTime());
         holder.calltype.setText(callModels.get(position).getCalltype());
+        holder.callerName.setText(callModels.get(position).getCallername());
+
         holder.call.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,7 +188,7 @@ public class CallAdapter extends RecyclerView.Adapter<CallAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView calltype,name,callduration,date;
+        TextView calltype,name,callduration,date,callerName;
         ImageView call;
 
 
@@ -195,6 +197,7 @@ public class CallAdapter extends RecyclerView.Adapter<CallAdapter.ViewHolder> {
             super(itemView);
             name=itemView.findViewById(R.id.name);
             calltype=itemView.findViewById(R.id.callType);
+            callerName = itemView.findViewById(R.id.callerName);
             callduration=itemView.findViewById(R.id.duration);
             date=itemView.findViewById(R.id.date);
             call=itemView.findViewById(R.id.ivCall);
