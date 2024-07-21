@@ -463,12 +463,14 @@ public class RecentCallFragment extends Fragment {
         Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, CallLog.Calls.DATE + " DESC");
         if (cursor != null) {
             int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
+            int nameIndex = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME);
             int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
             int date = cursor.getColumnIndex(CallLog.Calls.DATE);
             int duration = cursor.getColumnIndex(CallLog.Calls.DURATION);
             DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
 
             while (cursor.moveToNext()) {
+                String cachedName = cursor.getString(nameIndex);
                 String phNumber = cursor.getString(number);
                 String callType = cursor.getString(type);
                 String callDate = cursor.getString(date);
@@ -493,7 +495,7 @@ public class RecentCallFragment extends Fragment {
 
                 int min = Integer.parseInt(callDuration) / 60;
                 int seconds = Integer.parseInt(callDuration) - min * 60;
-                arrayList.add(new CallModel(phNumber, dir, String.valueOf(min) + ":" + String.valueOf(seconds), formattedDate));
+                arrayList.add(new CallModel(phNumber,cachedName, dir, String.valueOf(min) + ":" + String.valueOf(seconds), formattedDate));
             }
             callAdapter.notifyDataSetChanged();
             cursor.close();
