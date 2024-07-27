@@ -13,12 +13,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link UpdateDeleteFragment#newInstance} factory method to
+ * Use the  factory method to
  * create an instance of this fragment.
  */
-public class UpdateDeleteFragment extends DialogFragment {
+public class UpdateDeleteFragment extends BottomSheetDialogFragment {
     private EditText etName, etPhoneNumber;
     private Button btnUpdate;
     private Contact contact;
@@ -56,5 +60,19 @@ public class UpdateDeleteFragment extends DialogFragment {
         });
 
         return view;
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        if (dialog != null) {
+            View bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+                behavior.setPeekHeight(0);
+            }
+        }
     }
 }

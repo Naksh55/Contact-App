@@ -478,44 +478,67 @@ public class Contactragment extends Fragment {
 
         return view;
     }
+//    private void showUpdateDialog(final Contact contact) {
+//        if (contact.getId() == null) {
+//            Toast.makeText(getContext(), "Contact ID is missing", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        final Dialog dialog = new Dialog(getContext());
+//        dialog.setContentView(R.layout.fragment_update_delete); // Create a layout resource file for this dialog
+//        EditText etName = dialog.findViewById(R.id.etName);
+//        EditText etPhoneNumber = dialog.findViewById(R.id.etPhoneNumber);
+//        Button btnUpdate = dialog.findViewById(R.id.btnUpdate);
+//
+//        etName.setText(contact.getName());
+//        etPhoneNumber.setText(contact.getPhoneNumber());
+//
+//        btnUpdate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String newName = etName.getText().toString();
+//                String newPhoneNumber = etPhoneNumber.getText().toString();
+//
+//                contact.setName(newName);
+//                contact.setPhoneNumber(newPhoneNumber);
+//
+//                // Update the contact in Firebase
+//                DatabaseReference contactRef = databaseContacts.child(contact.getId());
+//                contactRef.setValue(contact);
+//
+//                // Update the contact in the local list and notify the adapter
+//                int index = contactList.indexOf(contact);
+//                contactList.set(index, contact);
+//                contactsAdapter.notifyItemChanged(index);
+//
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        dialog.show();
+//    }
+
     private void showUpdateDialog(final Contact contact) {
         if (contact.getId() == null) {
             Toast.makeText(getContext(), "Contact ID is missing", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        final Dialog dialog = new Dialog(getContext());
-        dialog.setContentView(R.layout.fragment_update_delete); // Create a layout resource file for this dialog
-        EditText etName = dialog.findViewById(R.id.etName);
-        EditText etPhoneNumber = dialog.findViewById(R.id.etPhoneNumber);
-        Button btnUpdate = dialog.findViewById(R.id.btnUpdate);
-
-        etName.setText(contact.getName());
-        etPhoneNumber.setText(contact.getPhoneNumber());
-
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
+        UpdateDeleteFragment updateDeleteFragment = new UpdateDeleteFragment(contact, new UpdateDeleteFragment.OnUpdateContactListener() {
             @Override
-            public void onClick(View v) {
-                String newName = etName.getText().toString();
-                String newPhoneNumber = etPhoneNumber.getText().toString();
-
-                contact.setName(newName);
-                contact.setPhoneNumber(newPhoneNumber);
-
+            public void onUpdateContact(Contact updatedContact) {
                 // Update the contact in Firebase
-                DatabaseReference contactRef = databaseContacts.child(contact.getId());
-                contactRef.setValue(contact);
+                DatabaseReference contactRef = databaseContacts.child(updatedContact.getId());
+                contactRef.setValue(updatedContact);
 
                 // Update the contact in the local list and notify the adapter
-                int index = contactList.indexOf(contact);
-                contactList.set(index, contact);
+                int index = contactList.indexOf(updatedContact);
+                contactList.set(index, updatedContact);
                 contactsAdapter.notifyItemChanged(index);
-
-                dialog.dismiss();
             }
         });
 
-        dialog.show();
+        updateDeleteFragment.show(getFragmentManager(), "updateDeleteFragment");
     }
 
     private void deleteContact(final Contact contact) {

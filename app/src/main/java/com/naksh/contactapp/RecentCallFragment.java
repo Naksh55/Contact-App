@@ -490,7 +490,9 @@ public class RecentCallFragment extends Fragment {
                         dir = "MISSED";
                         break;
                 }
-
+                if (cachedName == null || cachedName.isEmpty()) {
+                    cachedName = "Unknown";
+                }
 //                String contactName = getContactName(context, phNumber);
 
                 int min = Integer.parseInt(callDuration) / 60;
