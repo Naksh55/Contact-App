@@ -297,6 +297,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.ContactsContract;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -366,96 +367,60 @@ public class Contactragment extends Fragment {
         contactsAdapter = new ContactsAdapter(contactList);
         recyclerView.setAdapter(contactsAdapter);
         fab = view.findViewById(R.id.f);
-        // Set a click listener for the FAB
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialPadBottomSheetFragment dialPadFragment = new DialPadBottomSheetFragment();
-                assert getFragmentManager() != null;
-                dialPadFragment.show(getFragmentManager(), "dialPadFragment");
-            }
+
+        fab.setOnClickListener(v -> {
+            DialPadBottomSheetFragment dialPadFragment = new DialPadBottomSheetFragment();
+            assert getFragmentManager() != null;
+            dialPadFragment.show(getFragmentManager(), "dialPadFragment");
         });
 
         searchView = view.findViewById(R.id.searchView);
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchView.setIconified(false);
-                searchView.requestFocusFromTouch();
-            }
+        searchView.setOnClickListener(v -> {
+            searchView.setIconified(false);
+            searchView.requestFocusFromTouch();
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Perform final search
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // Filter the contacts as user types
                 filterContacts(newText);
                 return true;
             }
         });
 
-        voiceSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startVoiceSearch();
-            }
-        });
+        voiceSearchButton.setOnClickListener(v -> startVoiceSearch());
 
         databaseContacts = FirebaseDatabase.getInstance().getReference("contacts");
         databaseContacts.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                firebaseContactList.clear();
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Contact contact = postSnapshot.getValue(Contact.class);
-                    assert contact != null;
-                    contact.setId(postSnapshot.getKey());  // Set the ID from the database key
-                    firebaseContactList.add(contact);
+                if (permissionsGranted) {
+                    firebaseContactList.clear();
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        Contact contact = postSnapshot.getValue(Contact.class);
+                        assert contact != null;
+                        contact.setId(postSnapshot.getKey());
+                        firebaseContactList.add(contact);
+                    }
+                    mergeAndSetContacts();
                 }
-                mergeAndSetContacts();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle possible errors.
             }
         });
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false; // We don't want drag & drop functionality, just swipe
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                Contact contact = contactsAdapter.getContactAtPosition(position);
-                makeCall(contact.getPhoneNumber());
-                contactsAdapter.notifyItemChanged(position); // Reset the item state after swiping
-            }
-
-            @Override
-            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
-                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                    int actionState, boolean isCurrentlyActive) {
-                // Customize the swipe background, icons, etc. here
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        });
-
-        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         if (!hasPermissions(getContext(), REQUIRED_PERMISSIONS)) {
             ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS, MULTIPLE_PERMISSIONS_REQUEST_CODE);
         } else {
-            readContacts();
+            permissionsGranted = true;
+            loadContacts(); // Load contacts if permissions were already granted
         }
 
         contactsAdapter = new ContactsAdapter(contactList, new ContactsAdapter.OnUpdateClickListener() {
@@ -472,12 +437,134 @@ public class Contactragment extends Fragment {
 
         recyclerView.setAdapter(contactsAdapter);
 
-
-
-        recyclerView.setAdapter(contactsAdapter);
-
         return view;
     }
+
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+//                             @Nullable Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_contactragment, container, false);
+//
+//        voiceSearchButton = view.findViewById(R.id.voiceSearchButton);
+//        recyclerView = view.findViewById(R.id.recyclerView);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        contactList = new ArrayList<>();
+//        mobileContactList = new ArrayList<>();
+//        firebaseContactList = new ArrayList<>();
+//        contactsAdapter = new ContactsAdapter(contactList);
+//        recyclerView.setAdapter(contactsAdapter);
+//        fab = view.findViewById(R.id.f);
+//        // Set a click listener for the FAB
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DialPadBottomSheetFragment dialPadFragment = new DialPadBottomSheetFragment();
+//                assert getFragmentManager() != null;
+//                dialPadFragment.show(getFragmentManager(), "dialPadFragment");
+//            }
+//        });
+//
+//        searchView = view.findViewById(R.id.searchView);
+//        searchView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                searchView.setIconified(false);
+//                searchView.requestFocusFromTouch();
+//            }
+//        });
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                // Perform final search
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                // Filter the contacts as user types
+//                filterContacts(newText);
+//                return true;
+//            }
+//        });
+//
+//        voiceSearchButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startVoiceSearch();
+//            }
+//        });
+//
+//        databaseContacts = FirebaseDatabase.getInstance().getReference("contacts");
+//        databaseContacts.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                firebaseContactList.clear();
+//                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                    Contact contact = postSnapshot.getValue(Contact.class);
+//                    assert contact != null;
+//                    contact.setId(postSnapshot.getKey());  // Set the ID from the database key
+//                    firebaseContactList.add(contact);
+//                }
+//                mergeAndSetContacts();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                // Handle possible errors.
+//            }
+//        });
+//
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+//            @Override
+//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+//                return false; // We don't want drag & drop functionality, just swipe
+//            }
+//
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+//                int position = viewHolder.getAdapterPosition();
+//                Contact contact = contactsAdapter.getContactAtPosition(position);
+//                makeCall(contact.getPhoneNumber());
+//                contactsAdapter.notifyItemChanged(position); // Reset the item state after swiping
+//            }
+//
+//            @Override
+//            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+//                                    @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
+//                                    int actionState, boolean isCurrentlyActive) {
+//                // Customize the swipe background, icons, etc. here
+//                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+//            }
+//        });
+//
+//        itemTouchHelper.attachToRecyclerView(recyclerView);
+//
+//        if (!hasPermissions(getContext(), REQUIRED_PERMISSIONS)) {
+//            ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS, MULTIPLE_PERMISSIONS_REQUEST_CODE);
+//        } else {
+//            readContacts();
+//        }
+//
+//        contactsAdapter = new ContactsAdapter(contactList, new ContactsAdapter.OnUpdateClickListener() {
+//            @Override
+//            public void onUpdateClick(Contact contact) {
+//                showUpdateDialog(contact);
+//            }
+//        }, new ContactsAdapter.OnDeleteClickListener() {
+//            @Override
+//            public void onDeleteClick(Contact contact) {
+//                deleteContact(contact);
+//            }
+//        });
+//
+//        recyclerView.setAdapter(contactsAdapter);
+//
+//
+//        recyclerView.setAdapter(contactsAdapter);
+//
+//        return view;
+//    }
 //    private void showUpdateDialog(final Contact contact) {
 //        if (contact.getId() == null) {
 //            Toast.makeText(getContext(), "Contact ID is missing", Toast.LENGTH_SHORT).show();
@@ -622,6 +709,35 @@ public class Contactragment extends Fragment {
     }
 
 
+//    void readContacts() {
+//        Cursor phones = getActivity().getContentResolver().query(
+//                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+//
+//        if (phones != null) {
+//            int nameIndex = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+//            int numberIndex = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+//
+//            if (nameIndex == -1 || numberIndex == -1) {
+//                phones.close();
+//                return;
+//            }
+//
+//            mobileContactList.clear(); // Clear the list before adding new contacts
+//
+//            while (phones.moveToNext()) {
+//                String name = phones.getString(nameIndex);
+//                String phoneNumber = phones.getString(numberIndex);
+////                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
+//                // Add the contact to the list
+//                String id = UUID.randomUUID().toString();
+//
+//                mobileContactList.add(new Contact(id, name, phoneNumber));
+//            }
+//            phones.close();
+//            mergeAndSetContacts();
+//        }
+//    }
+
     void readContacts() {
         Cursor phones = getActivity().getContentResolver().query(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
@@ -640,18 +756,35 @@ public class Contactragment extends Fragment {
             while (phones.moveToNext()) {
                 String name = phones.getString(nameIndex);
                 String phoneNumber = phones.getString(numberIndex);
-//                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
                 // Add the contact to the list
                 String id = UUID.randomUUID().toString();
 
-                mobileContactList.add(new Contact(id,name, phoneNumber));
+                mobileContactList.add(new Contact(id, name, phoneNumber));
             }
             phones.close();
-            mergeAndSetContacts();
+            mergeAndSetContacts();  // Refresh contacts in UI
         }
     }
 
 
+//    void mergeAndSetContacts() {
+//        contactList.clear();
+//        contactList.addAll(mobileContactList);
+//        contactList.addAll(firebaseContactList);
+//
+//        // Sort the contact list alphabetically
+//        Collections.sort(contactList, new Comparator<Contact>() {
+//            @Override
+//            public int compare(Contact c1, Contact c2) {
+//                return c1.getName().compareToIgnoreCase(c2.getName());
+//            }
+//        });
+//
+//        contactsAdapter.notifyDataSetChanged();
+//
+//        // Save merged contactList to Firebase
+////        databaseContacts.setValue(contactList);  // Assuming your databaseContacts reference points to the correct location
+//    }
 
     void mergeAndSetContacts() {
         contactList.clear();
@@ -666,11 +799,9 @@ public class Contactragment extends Fragment {
             }
         });
 
-        contactsAdapter.notifyDataSetChanged();
-
-        // Save merged contactList to Firebase
-//        databaseContacts.setValue(contactList);  // Assuming your databaseContacts reference points to the correct location
+        contactsAdapter.notifyDataSetChanged();  // Notify adapter of data change
     }
+
 
 //    @Override
 //    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -704,6 +835,40 @@ public class Contactragment extends Fragment {
 //}
 
 
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == MULTIPLE_PERMISSIONS_REQUEST_CODE) {
+//            Map<String, Integer> perms = new HashMap<>();
+//            for (String permission : REQUIRED_PERMISSIONS) {
+//                perms.put(permission, PackageManager.PERMISSION_GRANTED);
+//            }
+//
+//            if (grantResults.length > 0) {
+//                for (int i = 0; i < permissions.length; i++) {
+//                    perms.put(permissions[i], grantResults[i]);
+//                }
+//
+//                boolean allPermissionsGranted = true;
+//                for (String permission : REQUIRED_PERMISSIONS) {
+//                    if (perms.get(permission) != PackageManager.PERMISSION_GRANTED) {
+//                        allPermissionsGranted = false;
+//                        break;
+//                    }
+//                }
+//                if (allPermissionsGranted) {
+//                    readContacts();
+//                    // Trigger fetching of call logs here if needed
+//                } else {
+//                    Toast.makeText(getContext(), "Permissions are required for this app to function properly", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        }
+//    }
+//}
+
+    private boolean permissionsGranted = false;
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -726,12 +891,18 @@ public class Contactragment extends Fragment {
                     }
                 }
                 if (allPermissionsGranted) {
-                    readContacts();
-                    // Trigger fetching of call logs here if needed
+                    permissionsGranted = true;
+                    loadContacts(); // Load contacts after permissions are granted
                 } else {
                     Toast.makeText(getContext(), "Permissions are required for this app to function properly", Toast.LENGTH_SHORT).show();
                 }
             }
+        }
+    }
+
+    private void loadContacts() {
+        if (permissionsGranted) {
+            readContacts(); // Load phone contacts
         }
     }
 }
