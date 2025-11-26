@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         databaseContacts = FirebaseDatabase.getInstance().getReference("contacts");
 
         recyclerView = findViewById(R.id.recyclerView);
-        addImg = findViewById(R.id.addimg);
+        addImg = findViewById(R.id.addFab);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

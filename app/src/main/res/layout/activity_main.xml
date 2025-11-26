@@ -1,60 +1,50 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:background="#FAFAFA"> <androidx.appcompat.widget.SearchView
+    android:id="@+id/searchView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="8dp"
+
+    android:background="@drawable/search_view_bg_enhanced_v2"
+    android:elevation="4dp"
+    android:iconifiedByDefault="false"
+    app:queryHint="Search Name"
+
+    app:queryBackground="@android:color/transparent"
+    app:closeIcon="@drawable/ic_close"
+    app:searchIcon="@drawable/ic_search"
+    app:theme="@style/ThemeOverlay.AppCompat.Light" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@+id/searchView"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
-        android:background="@color/black" />
+        android:layout_below="@+id/searchView"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
+        android:background="@android:color/transparent" />
 
-    <ImageView
-        android:id="@+id/addimg"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/baseline_add_box_24"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"/>
-
-<!--    <com.google.android.material.tabs.TabLayout-->
-<!--        android:id="@+id/tablayout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="50sp">-->
-
-<!--        <com.google.android.material.tabs.TabItem-->
-<!--            android:id="@+id/mContacts"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Contact" />-->
-
-<!--        <com.google.android.material.tabs.TabItem-->
-<!--            android:id="@+id/mRecents"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Recent Calls" />-->
-
-<!--    </com.google.android.material.tabs.TabLayout>-->
-
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchView"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addFab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/search_view_bg"
-        android:iconifiedByDefault="false"
-        app:queryHint="Search Name"
-        app:menu="@menu/search"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:contentDescription="Add New Contact"
+        android:backgroundTint="#009688"
+        android:tint="@android:color/white"
+        android:src="@drawable/baseline_add_24"
+        app:fabSize="normal"
+        app:borderWidth="0dp"
+        app:elevation="6dp" />
 
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--        android:id="@+id/mViewPage"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"/>-->
 </RelativeLayout>
